@@ -3,21 +3,24 @@ import { useState } from "react";
 import styles from "./index.module.css";
 
 export default function Home() {
-  const [animalInput, setAnimalInput] = useState("");
+  const [nameInput, setNameInput] = useState("");
+  const [mitzvahInput, setMitzvahInput] = useState("");
   const [result, setResult] = useState();
+  const [loading, setLoading] = useState(false);
 
   async function onSubmit(event) {
+    setLoading(true);
     event.preventDefault();
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ animal: animalInput }),
+      body: JSON.stringify({ name: nameInput, mitzvah: mitzvahInput }),
     });
     const data = await response.json();
     setResult(data.result);
-    setAnimalInput("");
+    setLoading(false);
   }
 
   return (
@@ -29,18 +32,25 @@ export default function Home() {
 
       <main className={styles.main}>
         <img src="/dog.png" className={styles.icon} />
-        <h3>Name my pet</h3>
-        <form onSubmit={onSubmit}>
+        <h3>Mitzvah Note Generator</h3>
+        <form onSubmit={onSubmit} disabled={loading}>
           <input
             type="text"
-            name="animal"
-            placeholder="Enter an animal"
-            value={animalInput}
-            onChange={(e) => setAnimalInput(e.target.value)}
+            name="name"
+            placeholder="Enter a name"
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
           />
-          <input type="submit" value="Generate names" />
+          <input
+            type="text"
+            name="mitzvah"
+            placeholder="Enter a mitzvah"
+            value={mitzvahInput}
+            onChange={(e) => setMitzvahInput(e.target.value)}
+          />
+          <input type="submit" value="Generate Mitzvah note" />
         </form>
-        <div className={styles.result}>{result}</div>
+        <div className={styles.result}>{loading ? 'Loading...' : result}</div>
       </main>
     </div>
   );
